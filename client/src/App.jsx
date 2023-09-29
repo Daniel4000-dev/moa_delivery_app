@@ -4,7 +4,7 @@ import { Login, Main } from './container';
 function App() {
 
   return (
-    <div className="w-screen min-h-screen h-auto flex flex-col items-center justify-center bg-white text-red-600">
+    <div className="w-screen min-h-screen h-auto flex flex-col items-center justify-center bg-white">
         
         <Routes>
           <Route path='/*' element={<Main />} />
