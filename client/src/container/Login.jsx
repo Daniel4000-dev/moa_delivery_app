@@ -2,14 +2,32 @@ import React, { useState } from "react";
 import { LoginBg, Logo } from "../assets";
 import { LoginInput } from "../components";
 import { motion } from "framer-motion";
-import { FaEnvelope, FaLock } from "../assets/icons/index";
+import { FaEnvelope, FaLock, FcGoogle } from "../assets/icons/index";
 import { buttonClick } from "../animations";
+
+import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { app } from "../config/firebaseConfig";
 
 const Login = () => {
   const [userEmail, setuserEmail] = useState("");
   const [isSignup, setIsSignup] = useState(false);
   const [password, setpassword] = useState(null);
-  const [confirmPassword, setConfirmPassword] = useState();
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const firebaseAuth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  const loginWithGoogle = async () => {
+    await signInWithPopup(firebaseAuth, provider).then(userCred => {
+      firebaseAuth.onAuthStateChanged(cred => {
+        if(cred) {
+           cred.getIdToken().then(token => {
+            console.log(token)
+           })
+        }
+      });
+    });
+  }
 
   return (
     <div className="w-screen h-screen relative overflow-hidden flex">
@@ -25,7 +43,9 @@ const Login = () => {
         </div>
 
         <p className="text-3xl font-semibold text-headingColor">Welcome Back</p>
-        <p className="text-xl text-textColor -mt-1">{isSignup ? 'Sign Up': 'Sign In'} with following</p>
+        <p className="text-xl text-textColor -mt-1">
+          {isSignup ? "Sign Up" : "Sign In"} with following
+        </p>
 
         <div className="w-full flex flex-col items-center justify-center gap-6 px-4 md:px-12 py-4">
           <LoginInput
@@ -82,15 +102,38 @@ const Login = () => {
           )}
 
           {isSignup ? (
-            <motion.button {...buttonClick} className='w-full px-4 py-2 rounded-md bg-red-400 cursor-pointer text-white text-xl capitalize hover:bg-red-500 transition-all duration-150'>
-            Sign Up
-          </motion.button>
+            <motion.button
+              {...buttonClick}
+              className="w-full px-4 py-2 rounded-md bg-red-400 cursor-pointer text-white text-xl capitalize hover:bg-red-500 transition-all duration-150"
+            >
+              Sign Up
+            </motion.button>
           ) : (
-            <motion.button {...buttonClick} className='w-full px-4 py-2 rounded-md bg-red-400 cursor-pointer text-white text-xl capitalize hover:bg-red-500 transition-all duration-150'>
-            Sign In
-          </motion.button>
+            <motion.button
+              {...buttonClick}
+              className="w-full px-4 py-2 rounded-md bg-red-400 cursor-pointer text-white text-xl capitalize hover:bg-red-500 transition-all duration-150"
+            >
+              Sign In
+            </motion.button>
           )}
         </div>
+
+        <div className="flex items-center justify-between gap-16">
+          <div className="w-24 h-[1px] rounded-md bg-white"></div>
+          <p className="text-white">or</p>
+          <div className="w-24 h-[1px] rounded-md bg-white"></div>
+        </div>
+
+        <motion.div
+          {...buttonClick}
+          onClick={loginWithGoogle}
+          className="flex items-center justify-center px-20 py-2 bg-cardOverlay backdrop-blur-md cursor-pointer rounded-3xl gap-4"
+        >
+          <FcGoogle className="text-3xl" />
+          <p className="capitalize text-base text-headingColor ">
+            Signin with Google
+          </p>
+        </motion.div>
       </div>
     </div>
   );
