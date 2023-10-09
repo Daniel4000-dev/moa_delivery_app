@@ -9,6 +9,9 @@ import {useNavigate} from 'react-router-dom';
 import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { app } from "../config/firebaseConfig";
 import { validateUserJWTToken } from "../api";
+import { setUserDetails } from "../context/actions/userActions";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
 
 const Login = () => {
   const [userEmail, setuserEmail] = useState("");
@@ -19,7 +22,15 @@ const Login = () => {
   const firebaseAuth = getAuth(app);
   const provider = new GoogleAuthProvider();
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector( state => state.user );
+
+  useEffect(() => {
+     if(user) {
+      navigate('/', { replace: true });
+     }
+  }, [user]);
 
   const loginWithGoogle = async () => {
     await signInWithPopup(firebaseAuth, provider).then(userCred => {
@@ -27,7 +38,7 @@ const Login = () => {
         if(cred) {
            cred.getIdToken().then(token => {
             validateUserJWTToken(token).then(data => {
-              console.log(data)
+              dispatch(setUserDetails(data));
             });
             navigate('/', { replace: true });
            })
@@ -49,7 +60,7 @@ const Login = () => {
             if(cred) {
                cred.getIdToken().then(token => {
                 validateUserJWTToken(token).then(data => {
-                  console.log(data)
+                  dispatch(setUserDetails(data))
                 });
                 navigate('/', { replace: true });
                })
@@ -62,6 +73,14 @@ const Login = () => {
     }
   }
 
+  // actions
+
+  // reducers
+
+  // store => Globalized
+
+  // dispatch
+
   const signInWithEmailPass = async () => {
     if(userEmail !== '' && password !== '') {
       await signInWithEmailAndPassword(firebaseAuth, userEmail, password).then(userCred => {
@@ -69,7 +88,7 @@ const Login = () => {
           if(cred) {
              cred.getIdToken().then(token => {
               validateUserJWTToken(token).then(data => {
-                console.log(data)
+                dispatch(setUserDetails(data))
               });
               navigate('/', { replace: true });
              })
