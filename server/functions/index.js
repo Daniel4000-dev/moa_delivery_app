@@ -44,6 +44,6 @@ admin.initializeApp({
   })
 
   const userRoute = require('./routes/user')
-  app.use('/api/user', userRoute)
+  app.use('/api/users', userRoute)
 
   exports.app = functions.https.onRequest(app);
