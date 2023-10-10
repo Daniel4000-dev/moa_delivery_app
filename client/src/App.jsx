@@ -1,18 +1,19 @@
 import { getAuth } from 'firebase/auth';
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {Route, Routes} from 'react-router-dom';
 import { fadeInOut } from './animations';
 import { validateUserJWTToken } from './api';
 import { app } from './config/firebaseConfig';
 import { motion } from 'framer-motion';
-import { Login, Main } from './container';
+import { Dashboard, Login, Main } from './container';
 import { setUserDetails } from './context/actions/userActions';
 import { Alert, MainLoader } from './components';
 
 function App() {
   const firebaseAuth = getAuth(app);
   const [isLoading, setisLoading] = useState(false)
+  const alert = useSelector(state => state.alert)
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -43,9 +44,10 @@ function App() {
         <Routes>
           <Route path='/*' element={<Main />} />
           <Route path='/login' element={<Login />} />
+          <Route path='/dashboard ' element={<Dashboard />} />
         </Routes>
 
-        <Alert type={''} message={'Hi there'} />
+        {alert?.type && <Alert type={alert?.type} message={alert?.message} />}
     </div>
   )
 }

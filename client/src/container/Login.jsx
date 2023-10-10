@@ -12,6 +12,7 @@ import { validateUserJWTToken } from "../api";
 import { setUserDetails } from "../context/actions/userActions";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
+import { alertInfo, alertWarning } from "../context/actions/alertActions";
 
 const Login = () => {
   const [userEmail, setuserEmail] = useState("");
@@ -25,6 +26,7 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector( state => state.user );
+  const alert = useSelector((state) => state.alert); 
 
   useEffect(() => {
      if(user) {
@@ -49,7 +51,7 @@ const Login = () => {
 
   const signUpWithEmailPass = async () => {
     if((userEmail === ''  || password === ''  || confirmPassword) === '' ) {
-      console.log('they are empty')
+      dispatch(alertInfo('Requied field shouold not be empty'))
     } else {
       if(password === confirmPassword) {
         setuserEmail('')
@@ -68,7 +70,7 @@ const Login = () => {
           });
         })
       } else {
-
+        dispatch(alertWarning('Password does not match'));
       }
     }
   }
@@ -96,7 +98,7 @@ const Login = () => {
         });
       })
     } else {
-
+      dispatch(alertWarning('Password does not match'));
     }
   }
 
