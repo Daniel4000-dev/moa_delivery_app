@@ -8,6 +8,7 @@ import { app } from './config/firebaseConfig';
 import { motion } from 'framer-motion';
 import { Login, Main } from './container';
 import { setUserDetails } from './context/actions/userActions';
+import { Alert, MainLoader } from './components';
 
 function App() {
   const firebaseAuth = getAuth(app);
@@ -36,13 +37,15 @@ function App() {
     <div className="w-screen min-h-screen h-auto flex flex-col items-center justify-center bg-white">
         {isLoading && (
           <motion.div {...fadeInOut} className='fixed z-50 inset-0 bg-lightgray backdrop-blur-md flex items-center justify-center w-full'>
-            loading...
+            <MainLoader />
           </motion.div>
         )}
         <Routes>
           <Route path='/*' element={<Main />} />
           <Route path='/login' element={<Login />} />
         </Routes>
+
+        <Alert type={''} message={'Hi there'} />
     </div>
   )
 }
