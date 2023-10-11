@@ -44,7 +44,7 @@ function App() {
         <Routes>
           <Route path='/*' element={<Main />} />
           <Route path='/login' element={<Login />} />
-          <Route path='/dashboard ' element={<Dashboard />} />
+          <Route path='/dashboard/*' element={<Dashboard />} />
         </Routes>
 
         {alert?.type && <Alert type={alert?.type} message={alert?.message} />}
