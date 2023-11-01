@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Logo } from "../assets";
+import { Avatar, Logo } from "../assets";
 import { isActiveStyles, isNotActiveStyles } from "../utils/styles";
 import { motion } from "framer-motion";
 import { buttonClick, slideTop } from "../animations";
@@ -9,13 +9,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAuth } from "firebase/auth";
 import { app } from "../config/firebaseConfig";
 import { setUserNull } from "../context/actions/userActions";
+import { setCartOn } from "../context/actions/displayCartAction";
 
 const Header = () => {
   const user = useSelector((state) => state.user);
+  const cart = useSelector((state) => state.cart);
+
   const [isMenu, setisMenu] = useState(false);
   const firebaseAuth = getAuth(app);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const isAdmin = user && user.admin === true;
 
   const signOut = () => {
     firebaseAuth
@@ -69,11 +74,19 @@ const Header = () => {
           </NavLink>
         </ul>
 
-        <motion.div {...buttonClick} className="relative cursor-pointer">
+        <motion.div
+          {...buttonClick}
+          onClick={() => dispatch(setCartOn())}
+          className="relative cursor-pointer"
+        >
           <MdShoppingCart className="text-3xl text-textColor" />
-          <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center absolute -top-4 -right-1">
-            <p className="text-primary text-base font-semibold">2</p>
-          </div>
+          {cart?.length > 0 && (
+            <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center absolute -top-4 -right-1">
+              <p className="text-primary text-base font-semibold">
+                {cart?.length}
+              </p>
+            </div>
+          )}
         </motion.div>
 
         {user ? (
@@ -81,7 +94,7 @@ const Header = () => {
             className="relative cursor-pointer"
             onMouseEnter={() => setisMenu(true)}
           >
-            <div className="w-12 h-12 rounded-full shadow-md cursor-pointer overflow-hidden flex items-center justify-center">
+            <div className="w-12 h-12 bg-red-300 rounded-full shadow-md cursor-pointer overflow-hidden flex items-center justify-center">
               <motion.img
                 className="w-full h-full object-cover"
                 src={user?.picture ? user?.picture : Avatar}
@@ -95,13 +108,13 @@ const Header = () => {
                 {...slideTop}
                 onMouseLeave={() => setisMenu(false)}
                 className="px-6 py-4 w-48 bg-cardOverlay backdrop-blur-md rounded-md shadow-md absolute top-12 right-0 flex flex-col gap-4"
-              >
+              > {isAdmin ? (
                 <Link
                   className="hover:text-red-500 text-xl text-textColor"
                   to={"/dashboard/home"}
                 >
                   Dashboard
-                </Link>
+                </Link>) : ''}
                 <Link
                   className="hover:text-red-500 text-xl text-textColor"
                   to={"/profile"}

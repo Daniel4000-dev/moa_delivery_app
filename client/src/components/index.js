@@ -11,7 +11,13 @@ import DbItems from "./DbItems";
 import DbOrders from "./DbOrders";
 import DbUsers from "./DbUsers";
 import DataTable from "./DataTable";
-import Spinner from './Spinner'
+import Spinner from './Spinner';
+import Home from './Home';
+import HomeSlider from './HomeSlider';
+import Slider from './Slider';
+import SliderCard from './SliderCard';
+import FilterSection from './FilterSection';
+import Cart from './Cart';
 
 export {
     Alert,
@@ -28,4 +34,10 @@ export {
     DbUsers,
     DataTable,
     Spinner,
+    Home,
+    HomeSlider,
+    Slider,
+    SliderCard,
+    FilterSection,
+    Cart,
 }

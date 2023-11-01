@@ -14,6 +14,19 @@ export const validateUserJWTToken = async (token) => {
   }
 };
 
+export const setAdminRoleOnServer = async (uid) => {
+  try {
+    const response = await axios.post(`${baseURL}/api/admin/setAdminRole`, { uid });
+    if (response.data.success) {
+      console.log('Admin role set successfully');
+    } else {
+      console.error('Failed to set admin role:', response.data.error);
+    }
+  } catch (error) {
+    console.error('Error making the HTTP request:', error);
+  }
+}
+
 // add new product
 export const addNewProduct = async (data) => {
   try {
@@ -53,4 +66,35 @@ export const getAllUsers = async () => {
     } catch (err) {
         return null;
     }
+};
+
+// add an item to cart
+export const addNewItemToCart = async (user_id, data) => {
+  try {
+    const res = await axios.post(`${baseURL}/api/products/addToCart/${user_id}`, {...data });
+    return res.data.data;
+  } catch (err) {
+    return null;
+  }
+};
+
+export const getAllCartItems = async (user_id) => {
+  try {
+    const res = await axios.get(`${baseURL}/api/products/getCartItems/${user_id}`);
+    return res.data.data;
+  } catch (err) {
+    return null;
+  }
+};
+
+// cart increament 
+export const increaseItemQuantity = async (user_id, productId, type) => {
+  console.log(user_id, productId, type);
+  try {
+    const res = await axios.post(`${baseURL}/api/products/updateCart/${user_id}`, null, { params: { productId: productId, type: type } }
+    );
+    return res.data.data;
+  } catch (err) {
+    return null;
+  }
 };

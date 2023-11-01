@@ -5,14 +5,16 @@ import { motion } from "framer-motion";
 import { FaEnvelope, FaLock, FcGoogle } from "../assets/icons/index";
 import { buttonClick } from "../animations";
 import {useNavigate} from 'react-router-dom';
+import { getFunctions } from 'firebase/functions';
+
 
 import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { app } from "../config/firebaseConfig";
-import { validateUserJWTToken } from "../api";
+import { setAdminRoleOnServer, validateUserJWTToken } from "../api";
 import { setUserDetails } from "../context/actions/userActions";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { alertInfo, alertWarning } from "../context/actions/alertActions";
+import { alertInfo, alertNull, alertWarning } from "../context/actions/alertActions";
 
 const Login = () => {
   const [userEmail, setuserEmail] = useState("");
@@ -28,79 +30,126 @@ const Login = () => {
   const user = useSelector( state => state.user );
   const alert = useSelector((state) => state.alert); 
 
-  useEffect(() => {
-     if(user) {
-      navigate('/', { replace: true });
-     }
-  }, [user]);
+  // useEffect(() => {
+  //    if(user) {
+  //     navigate('/', { replace: true });
+  //    }
+  // }, [user]);
 
   const loginWithGoogle = async () => {
-    await signInWithPopup(firebaseAuth, provider).then(userCred => {
-      firebaseAuth.onAuthStateChanged(cred => {
-        if(cred) {
-           cred.getIdToken().then(token => {
-            validateUserJWTToken(token).then(data => {
-              dispatch(setUserDetails(data));
-            });
-            navigate('/', { replace: true });
-           })
-        }
-      });
-    });
-  }
+    try {
+      // Sign in with Google
+      const result = await signInWithPopup(firebaseAuth, provider);
+      const user = result.user;
+      const uid = user.uid;
+  
+      // Call your server to set the "admin" claim
+      await setAdminRoleOnServer(uid);
+  
+      // Get the user's ID token
+      const idToken = await user.getIdToken();
+  
+      // Validate the user's JWT token and get user data
+      const data = await validateUserJWTToken(idToken);
+  
+      console.log(data);
+  
+      if (data && data.admin === true) {
+        console.log('User is an admin');
+        // User is an admin: handle this case as needed
+        // dispatch(setUserDetails(data));
+        navigate('/', { replace: true });
+      } else {
+        // User is not an admin: handle this case as needed
+        console.log('User is not an admin.');
+      }
+    } catch (error) {
+      console.error("Google sign-in error:", error);
+      // Handle sign-in error
+    }
+  };
+  
+  
 
   const signUpWithEmailPass = async () => {
-    if((userEmail === ''  || password === ''  || confirmPassword) === '' ) {
-      dispatch(alertInfo('Requied field shouold not be empty'))
-    } else {
-      if(password === confirmPassword) {
-        setuserEmail('')
-        setpassword('')
-        setConfirmPassword('')
-        await createUserWithEmailAndPassword(firebaseAuth, userEmail, password).then(userCred => {
-          firebaseAuth.onAuthStateChanged(cred => {
-            if(cred) {
-               cred.getIdToken().then(token => {
-                validateUserJWTToken(token).then(data => {
-                  dispatch(setUserDetails(data))
-                });
-                navigate('/', { replace: true });
-               })
-            }
-          });
-        })
-      } else {
-        dispatch(alertWarning('Password does not match'));
-      }
+    if (!userEmail || !password || !confirmPassword) {
+      dispatch(alertInfo('Required fields should not be empty'));
+      return;
     }
-  }
-
-  // actions
-
-  // reducers
-
-  // store => Globalized
-
-  // dispatch
+  
+    if (password !== confirmPassword) {
+      dispatch(alertWarning('Password does not match'));
+      setInterval(() => {
+        dispatch(alertNull());
+      }, 3000);
+      return;
+    }
+  
+    try {
+      const userCred = await createUserWithEmailAndPassword(firebaseAuth, userEmail, password);
+      const user = userCred.user;
+      const uid = user.uid;
+  
+      // Make an API call to your server to set the "admin" claim
+      await setAdminRoleOnServer(uid);
+  
+      const token = await user.getIdToken();
+      const data = await validateUserJWTToken(token);
+      console.log(data);
+  
+      if (data && data.admin === true) {
+        console.log('is an admin');
+        // User is an admin: handle this case as needed
+        // dispatch(setUserDetails(data));
+        // navigate('/', { replace: true });
+      } else {
+        // User is not an admin: handle this case as needed
+        console.log('User is not an admin.');
+      }
+    } catch (error) {
+      console.error('Sign-up error:', error);
+      // Handle sign-up error
+    }
+  };
+  
 
   const signInWithEmailPass = async () => {
-    if(userEmail !== '' && password !== '') {
-      await signInWithEmailAndPassword(firebaseAuth, userEmail, password).then(userCred => {
-        firebaseAuth.onAuthStateChanged(cred => {
-          if(cred) {
-             cred.getIdToken().then(token => {
-              validateUserJWTToken(token).then(data => {
-                dispatch(setUserDetails(data))
-              });
-              navigate('/', { replace: true });
-             })
-          }
-        });
-      })
-    } else {
-      dispatch(alertWarning('Password does not match'));
+    if (!userEmail || !password) {
+      dispatch(alertWarning('Email and password are required'));
+      return;
     }
-  }
+  
+    try {
+      const userCred = await signInWithEmailAndPassword(firebaseAuth, userEmail, password);
+      const user = userCred.user;
+      const uid = user.uid;
+  
+      // Make an API call to your server to set the "admin" claim
+      await setAdminRoleOnServer(uid);
+  
+      const token = await user.getIdToken();
+      const data = await validateUserJWTToken(token);
+      console.log(token)
+  
+      if (data && data.admin === true) {
+        console.log(data)
+        // User is an admin
+        // dispatch(setUserDetails(data));
+        // navigate('/', { replace: true });
+        console.log('is an admin')
+      } else {
+        // User is not an admin: handle this case as needed
+        console.log('User is not an admin.');
+        navigate('/', { replace: true });
+      }
+    } catch (error) {
+      console.error('Sign-in error:', error);
+      // Handle sign-in error
+    }
+  };
+  
+
+  
 
   return (
     <div className="w-screen h-screen relative overflow-hidden flex">

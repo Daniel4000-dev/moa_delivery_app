@@ -10,6 +10,7 @@ import { alertNull, alertSuccess } from "../context/actions/alertActions";
 const DbItems = () => {
   const dispatch = useDispatch();
   const products = useSelector((state) => state.products);
+  console.log(products)
   useEffect(() => {
     // Check if products is null, and if so, fetch the products
     if (products === null) {
@@ -61,7 +62,7 @@ const DbItems = () => {
       icon: "edit",
       tooltip: "Edit Data",
       onClick: (event, rowData) => {
-        alert("You want to edit" + rowData.productId);
+        alert("You want to edit" + rowData.product);
       },
     },
     {

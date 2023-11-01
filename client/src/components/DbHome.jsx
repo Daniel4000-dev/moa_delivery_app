@@ -8,7 +8,17 @@ const DbHome = () => {
   const products = useSelector((state) => state.products);
   const dispatch = useDispatch();
 
-  const dinks = products?.filter(item => item.product_category === 'drinks');
+  const drinks = products?.filter((item) => item.product_category === "drinks");
+  const desserts = products?.filter(
+    (item) => item.product_category === "desserts"
+  );
+  const fruits = products?.filter((item) => item.product_category === "fruits");
+  const rice = products?.filter((item) => item.product_category === "rice");
+  const curry = products?.filter((item) => item.product_category === "curry");
+  const chinese = products?.filter(
+    (item) => item.product_category === "chinese"
+  );
+  const bread = products?.filter((item) => item.product_category === "bread");
 
   useEffect(() => {
     if (products === null) {
@@ -28,19 +38,27 @@ const DbHome = () => {
               type="bar"
               data={{
                 labels: [
-                  "January",
-                  "February",
-                  "March",
-                  "April",
-                  "May",
-                  "June",
-                  "July",
+                  "Drinks",
+                  "Desserts",
+                  "Fruits",
+                  "Rice",
+                  "Curry",
+                  "Bread",
+                  "Chinese",
                 ],
                 datasets: [
                   {
-                    label: "GitHub Commits",
+                    label: "Category Wise Count",
                     backgroundColor: "#f87979",
-                    data: [40, 20, 12, 39, 10, 40, 39, 80, 40],
+                    data: [
+                      drinks?.length,
+                      desserts?.length,
+                      fruits?.length,
+                      rice?.length,
+                      curry?.length,
+                      bread?.length,
+                      chinese?.length,
+                    ],
                   },
                 ],
               }}
@@ -53,14 +71,14 @@ const DbHome = () => {
             <CChart
               type="doughnut"
               data={{
-                labels: ["VueJs", "EmberJs", "ReactJs", "AngularJs"],
+                labels: ["Orders", "Delivered", "Cancelled", "Paid", "Not Paid"],
                 datasets: [
                   {
                     backgroundColor: [
-                      "#41B883",
-                      "#E46651",
+                      "#51FF08",
+                      "#0886FF",
                       "#00D8FF",
-                      "#DD1B16",
+                      "#FF00FB",
                     ],
                     data: [40, 20, 80, 10],
                   },
